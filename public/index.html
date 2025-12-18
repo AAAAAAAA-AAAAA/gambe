@@ -9,10 +9,20 @@
         button { font-size: 1.2rem; padding: 12px 30px; border-radius: 8px; border: none; background: #4caf50; color: #fff; cursor: pointer; transition: background 0.2s; margin: 8px; box-shadow: 0 2px 8px #b2dfdb; }
         button:hover { background: #388e3c; }
         #result { margin-top: 30px; font-size: 3rem; min-height: 3.5rem; color: #388e3c; }
-        #money-amount { font-size: 1.5rem; margin-top: 10px; color: #ffd600; }
+        #money-amount { font-size: 1.5rem; margin-top: 10px; color: #bfa100; }
         #balance { font-size: 1.3rem; margin-bottom: 20px; color: #2e7d32; font-weight: bold; }
         .tab { display: inline-block; margin: 0 10px; cursor: pointer; font-size: 1.1rem; color: #388e3c; border-bottom: 2px solid transparent; padding-bottom: 4px; font-weight: bold; }
-        .tab.active { color: #ffd600; border-bottom: 2px solid #ffd600; }
+        .tab.active { color: #bfa100; border-bottom: 2px solid #bfa100; }
+        #minigame-btn { background: #ffe066; color: #388e3c; border-radius: 50%; width: 60px; height: 60px; font-size: 2rem; border: none; box-shadow: 0 2px 8px #b2dfdb; margin: 20px auto 0 auto; display: block; }
+        #minigame-btn:hover { background: #bfa100; color: #fff; }
+        #jobs-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(34, 49, 34, 0.7); z-index: 1000; }
+        #jobs-content { background: #fff; color: #222; border-radius: 16px; max-width: 350px; margin: 80px auto; padding: 30px 20px; box-shadow: 0 4px 24px #b2dfdb; }
+        .job-btn { display: flex; align-items: center; background: #e8f5e9; color: #388e3c; border: none; border-radius: 8px; padding: 12px 18px; margin: 12px 0; font-size: 1.1rem; cursor: pointer; transition: background 0.2s; width: 100%; text-align: left; }
+        .job-btn:hover { background: #b6f5c6; color: #bfa100; }
+        .job-emoji { font-size: 2rem; margin-right: 14px; }
+        #close-jobs { margin-top: 18px; background: #4caf50; color: #fff; border: none; border-radius: 6px; padding: 8px 20px; font-size: 1rem; }
+        #close-jobs:hover { background: #388e3c; }
+        #job-result { color: #388e3c; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -25,6 +35,15 @@
         <button onclick="spin()">Spin (50 💸)</button>
         <div id="result"></div>
         <div id="money-amount"></div>
+    </div>
+    <button id="minigame-btn" onclick="openJobsModal()">🧑‍💼</button>
+    <div id="jobs-modal">
+        <div id="jobs-content">
+            <h3>Choose a Job</h3>
+            <div id="jobs-list"></div>
+            <div id="job-result"></div>
+            <button id="close-jobs" onclick="closeJobsModal()">Close</button>
+        </div>
     </div>
     <script>
         let balance = 200;
@@ -40,6 +59,19 @@
             { emoji: '💎', amount: 500, chance: 0.012 },// 500 money, 1.2%
             { emoji: '🎰', amount: 1000, chance: 0.004 },// Jackpot 1000, 0.4%
             { emoji: '👑', amount: 1500, chance: 0.001 } // Jackpot 1500, 0.1%
+        ];
+
+        const jobs = [
+            { emoji: '🍔', name: 'Fast Food Worker', reward: 10, desc: 'Serve burgers and fries.' },
+            { emoji: '🧹', name: 'Janitor', reward: 12, desc: 'Keep places clean and tidy.' },
+            { emoji: '💻', name: 'Programmer', reward: 30, desc: 'Write code and fix bugs.' },
+            { emoji: '🎨', name: 'Artist', reward: 20, desc: 'Create beautiful art.' },
+            { emoji: '🚚', name: 'Delivery Driver', reward: 15, desc: 'Deliver packages quickly.' },
+            { emoji: '👩‍⚕️', name: 'Nurse', reward: 25, desc: 'Help people stay healthy.' },
+            { emoji: '🧑‍🏫', name: 'Teacher', reward: 18, desc: 'Teach students new things.' },
+            { emoji: '🛠️', name: 'Mechanic', reward: 22, desc: 'Fix cars and machines.' },
+            { emoji: '🧑‍🍳', name: 'Chef', reward: 24, desc: 'Cook delicious meals.' },
+            { emoji: '🧑‍🔬', name: 'Scientist', reward: 35, desc: 'Discover new things.' }
         ];
 
         function updateBalance() {
@@ -77,6 +109,28 @@
             // Hide minigame tab if it exists
             var minigameTab = document.getElementById('minigame-tab');
             if (minigameTab) minigameTab.style.display = 'none';
+        }
+
+        function openJobsModal() {
+            const jobsList = document.getElementById('jobs-list');
+            jobsList.innerHTML = '';
+            jobs.forEach(job => {
+                const btn = document.createElement('button');
+                btn.className = 'job-btn';
+                btn.innerHTML = `<span class="job-emoji">${job.emoji}</span> <span><b>${job.name}</b><br><small>${job.desc}</small></span>`;
+                btn.onclick = function() { earnJobMoney(job); };
+                jobsList.appendChild(btn);
+            });
+            document.getElementById('job-result').textContent = '';
+            document.getElementById('jobs-modal').style.display = 'block';
+        }
+        function closeJobsModal() {
+            document.getElementById('jobs-modal').style.display = 'none';
+        }
+        function earnJobMoney(job) {
+            balance += job.reward;
+            updateBalance();
+            document.getElementById('job-result').textContent = `You earned $${job.reward} as a ${job.name}!`;
         }
 
         // Initialize
