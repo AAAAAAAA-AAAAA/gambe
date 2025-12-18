@@ -3,48 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animal Emoji Gamble</title>
+    <title>Money Emoji Gamble</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #222; color: #fff; text-align: center; padding-top: 60px; }
-        button { font-size: 1.5rem; padding: 15px 40px; border-radius: 8px; border: none; background: #ff9800; color: #fff; cursor: pointer; transition: background 0.2s; }
-        button:hover { background: #ffa726; }
-        #result { margin-top: 40px; font-size: 4rem; min-height: 4.5rem; }
-        #animal-name { font-size: 1.2rem; margin-top: 10px; color: #ffd54f; }
+        body { font-family: Arial, sans-serif; background: #b6f5c6; color: #1b3a1b; text-align: center; padding-top: 60px; }
+        button { font-size: 1.2rem; padding: 12px 30px; border-radius: 8px; border: none; background: #4caf50; color: #fff; cursor: pointer; transition: background 0.2s; margin: 8px; box-shadow: 0 2px 8px #b2dfdb; }
+        button:hover { background: #388e3c; }
+        #result { margin-top: 30px; font-size: 3rem; min-height: 3.5rem; color: #388e3c; }
+        #money-amount { font-size: 1.5rem; margin-top: 10px; color: #ffd600; }
+        #balance { font-size: 1.3rem; margin-bottom: 20px; color: #2e7d32; font-weight: bold; }
+        .tab { display: inline-block; margin: 0 10px; cursor: pointer; font-size: 1.1rem; color: #388e3c; border-bottom: 2px solid transparent; padding-bottom: 4px; font-weight: bold; }
+        .tab.active { color: #ffd600; border-bottom: 2px solid #ffd600; }
     </style>
 </head>
 <body>
-    <h1>Animal Emoji Gamble</h1>
-    <button onclick="generateAnimal()">Spin!</button>
-    <div id="result"></div>
-    <div id="animal-name"></div>
+    <div>
+        <span class="tab active" id="gamble-tab" onclick="showTab('gamble')">Gamble</span>
+    </div>
+    <div id="balance">Balance: <span id="balance-amount">200</span> 💰</div>
+    <div id="gamble">
+        <h1>Money Emoji Gamble</h1>
+        <button onclick="spin()">Spin (50 💸)</button>
+        <div id="result"></div>
+        <div id="money-amount"></div>
+    </div>
     <script>
-        // Animal emojis with their probabilities (total should sum to 1)
-        const animals = [
-            { emoji: '🐶', name: 'Dog', chance: 0.25 },
-            { emoji: '🐱', name: 'Cat', chance: 0.20 },
-            { emoji: '🦁', name: 'Lion', chance: 0.15 },
-            { emoji: '🐵', name: 'Monkey', chance: 0.13 },
-            { emoji: '🐸', name: 'Frog', chance: 0.10 },
-            { emoji: '🐼', name: 'Panda', chance: 0.08 },
-            { emoji: '🦄', name: 'Unicorn', chance: 0.05 },
-            { emoji: '🐲', name: 'Dragon', chance: 0.04 },
+        let balance = 200;
+        const costPerSpin = 50;
+        const rewards = [
+            { emoji: '💸', amount: 0, chance: 0.40 },   // 0 money, 40%
+            { emoji: '💵', amount: 20, chance: 0.22 },  // 20 money, 22%
+            { emoji: '💶', amount: 50, chance: 0.13 },  // 50 money, 13%
+            { emoji: '💷', amount: 100, chance: 0.08 }, // 100 money, 8%
+            { emoji: '💴', amount: 200, chance: 0.06 }, // 200 money, 6%
+            { emoji: '🪙', amount: 300, chance: 0.045 }, // 300 money, 4.5%
+            { emoji: '💰', amount: 400, chance: 0.025 }, // 400 money, 2.5%
+            { emoji: '💎', amount: 500, chance: 0.012 },// 500 money, 1.2%
+            { emoji: '🎰', amount: 1000, chance: 0.004 },// Jackpot 1000, 0.4%
+            { emoji: '👑', amount: 1500, chance: 0.001 } // Jackpot 1500, 0.1%
         ];
 
-        function generateAnimal() {
+        function updateBalance() {
+            document.getElementById('balance-amount').textContent = balance;
+        }
+
+        function spin() {
+            if (balance < costPerSpin) {
+                document.getElementById('result').textContent = '❌';
+                document.getElementById('money-amount').textContent = 'Not enough money!';
+                return;
+            }
+            balance -= costPerSpin;
+            updateBalance();
             let rand = Math.random();
             let sum = 0;
-            for (let animal of animals) {
-                sum += animal.chance;
+            for (let reward of rewards) {
+                sum += reward.chance;
                 if (rand < sum) {
-                    document.getElementById('result').textContent = animal.emoji;
-                    document.getElementById('animal-name').textContent = animal.name;
+                    balance += reward.amount;
+                    updateBalance();
+                    document.getElementById('result').textContent = reward.emoji;
+                    document.getElementById('money-amount').textContent = `You won ${reward.amount} money!`;
                     return;
                 }
             }
-            // Fallback (should not happen)
+            // Fallback
             document.getElementById('result').textContent = '❓';
-            document.getElementById('animal-name').textContent = 'Unknown';
+            document.getElementById('money-amount').textContent = 'Unknown result';
         }
+
+        function showTab(tab) {
+            document.getElementById('gamble').style.display = '';
+            document.getElementById('gamble-tab').classList.add('active');
+            // Hide minigame tab if it exists
+            var minigameTab = document.getElementById('minigame-tab');
+            if (minigameTab) minigameTab.style.display = 'none';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            showTab('gamble');
+            updateBalance();
+        });
     </script>
 </body>
 </html>
