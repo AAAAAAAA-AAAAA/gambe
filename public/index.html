@@ -28,6 +28,7 @@
 <body>
     <div>
         <span class="tab active" id="gamble-tab" onclick="showTab('gamble')">Gamble</span>
+        <span class="tab" id="minigame-tab" style="display:none;" onclick="showTab('minigame')"></span>
     </div>
     <div id="balance">Balance: <span id="balance-amount">200</span> 💰</div>
     <div id="gamble">
@@ -45,6 +46,7 @@
             <button id="close-jobs" onclick="closeJobsModal()">Close</button>
         </div>
     </div>
+    <div id="minigame" style="display:none;"></div>
     <script>
         let balance = 200;
         const costPerSpin = 50;
@@ -73,6 +75,8 @@
             { emoji: '🧑‍🍳', name: 'Chef', reward: 24, desc: 'Cook delicious meals.' },
             { emoji: '🧑‍🔬', name: 'Scientist', reward: 35, desc: 'Discover new things.' }
         ];
+
+        let currentJob = null;
 
         function updateBalance() {
             document.getElementById('balance-amount').textContent = balance;
@@ -104,11 +108,13 @@
         }
 
         function showTab(tab) {
-            document.getElementById('gamble').style.display = '';
-            document.getElementById('gamble-tab').classList.add('active');
-            // Hide minigame tab if it exists
-            var minigameTab = document.getElementById('minigame-tab');
-            if (minigameTab) minigameTab.style.display = 'none';
+            document.getElementById('gamble').style.display = tab === 'gamble' ? '' : 'none';
+            document.getElementById('gamble-tab').classList.toggle('active', tab === 'gamble');
+            document.getElementById('minigame').style.display = tab === 'minigame' ? '' : 'none';
+            document.getElementById('minigame-tab').classList.toggle('active', tab === 'minigame');
+            if(tab === 'minigame' && currentJob) {
+                renderMinigame(currentJob);
+            }
         }
 
         function openJobsModal() {
@@ -118,7 +124,7 @@
                 const btn = document.createElement('button');
                 btn.className = 'job-btn';
                 btn.innerHTML = `<span class="job-emoji">${job.emoji}</span> <span><b>${job.name}</b><br><small>${job.desc}</small></span>`;
-                btn.onclick = function() { earnJobMoney(job); };
+                btn.onclick = function() { selectJob(job); };
                 jobsList.appendChild(btn);
             });
             document.getElementById('job-result').textContent = '';
@@ -127,16 +133,37 @@
         function closeJobsModal() {
             document.getElementById('jobs-modal').style.display = 'none';
         }
-        function earnJobMoney(job) {
-            balance += job.reward;
-            updateBalance();
-            document.getElementById('job-result').textContent = `You earned $${job.reward} as a ${job.name}!`;
+        function selectJob(job) {
+            currentJob = job;
+            document.getElementById('minigame-tab').textContent = job.emoji + ' ' + job.name;
+            document.getElementById('minigame-tab').style.display = '';
+            closeJobsModal();
+            showTab('minigame');
+        }
+        function renderMinigame(job) {
+            // Simple minigame: click a button to complete a task for the job
+            document.getElementById('minigame').innerHTML = `
+                <h2>${job.emoji} ${job.name} Minigame</h2>
+                <p>${job.desc}</p>
+                <button id="job-action-btn">Do your job!</button>
+                <div id="minigame-result"></div>
+            `;
+            document.getElementById('job-action-btn').onclick = function() {
+                // Earn money for the job
+                balance += job.reward;
+                updateBalance();
+                document.getElementById('minigame-result').textContent = `You earned $${job.reward} as a ${job.name}!`;
+            };
         }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             showTab('gamble');
             updateBalance();
+            // Move minigame button to the right side
+            document.getElementById('minigame-btn').style.position = 'fixed';
+            document.getElementById('minigame-btn').style.top = '80px';
+            document.getElementById('minigame-btn').style.right = '40px';
         });
     </script>
 </body>
