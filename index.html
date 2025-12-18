@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Emoji Gamble</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #222; color: #fff; text-align: center; padding-top: 60px; }
+        button { font-size: 1.5rem; padding: 15px 40px; border-radius: 8px; border: none; background: #ff9800; color: #fff; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #ffa726; }
+        #result { margin-top: 40px; font-size: 4rem; min-height: 4.5rem; }
+        #animal-name { font-size: 1.2rem; margin-top: 10px; color: #ffd54f; }
+    </style>
+</head>
+<body>
+    <h1>Animal Emoji Gamble</h1>
+    <button onclick="generateAnimal()">Spin!</button>
+    <div id="result"></div>
+    <div id="animal-name"></div>
+    <script>
+        // Animal emojis with their probabilities (total should sum to 1)
+        const animals = [
+            { emoji: '🐶', name: 'Dog', chance: 0.25 },
+            { emoji: '🐱', name: 'Cat', chance: 0.20 },
+            { emoji: '🦁', name: 'Lion', chance: 0.15 },
+            { emoji: '🐵', name: 'Monkey', chance: 0.13 },
+            { emoji: '🐸', name: 'Frog', chance: 0.10 },
+            { emoji: '🐼', name: 'Panda', chance: 0.08 },
+            { emoji: '🦄', name: 'Unicorn', chance: 0.05 },
+            { emoji: '🐲', name: 'Dragon', chance: 0.04 },
+        ];
+
+        function generateAnimal() {
+            let rand = Math.random();
+            let sum = 0;
+            for (let animal of animals) {
+                sum += animal.chance;
+                if (rand < sum) {
+                    document.getElementById('result').textContent = animal.emoji;
+                    document.getElementById('animal-name').textContent = animal.name;
+                    return;
+                }
+            }
+            // Fallback (should not happen)
+            document.getElementById('result').textContent = '❓';
+            document.getElementById('animal-name').textContent = 'Unknown';
+        }
+    </script>
+</body>
+</html>
